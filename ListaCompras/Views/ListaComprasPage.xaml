@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="ListaCompras.Views.ListaComprasPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:ListaCompras.ViewModels"
+    BackgroundColor="#0F1115">
+
+    <!-- ==== Recursos locales (solo en esta página) ==== -->
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Paleta -->
+            <Color x:Key="Bg">#0F1115</Color>
+            <Color x:Key="Surface">#171A21</Color>
+            <Color x:Key="SurfaceAlt">#1E2430</Color>
+            <Color x:Key="Stroke">#2B3242</Color>
+            <Color x:Key="TextPrimary">#FFFFFF</Color>
+            <Color x:Key="TextMuted">#B9C0CF</Color>
+            <Color x:Key="Accent">#8B5CF6</Color>
+            <Color x:Key="Danger">#EF4444</Color>
+            <Color x:Key="DangerDark">#B91C1C</Color>
+
+            <!-- Estilos -->
+            <Style TargetType="Entry" x:Key="Input">
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceAlt}" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
+                <Setter Property="HeightRequest" Value="42"/>
+            </Style>
+
+            <Style TargetType="Editor" x:Key="InputMulti">
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceAlt}" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
+            </Style>
+
+            <Style TargetType="Button" x:Key="PillBtn">
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="HeightRequest" Value="42"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+                <Setter Property="BackgroundColor" Value="{StaticResource Accent}"/>
+            </Style>
+
+            <!-- Botón circular rojo de eliminar (X como Label dentro) -->
+            <Style TargetType="Border" x:Key="DeleteCircle">
+                <Setter Property="BackgroundColor" Value="{StaticResource Danger}"/>
+                <Setter Property="Stroke" Value="{StaticResource DangerDark}"/>
+                <Setter Property="StrokeShape" Value="RoundRectangle 22"/>
+                <Setter Property="WidthRequest" Value="44"/>
+                <Setter Property="HeightRequest" Value="44"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <viewmodels:ListaComprasViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <!-- Título -->
+            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                <Label Text="🛒" FontSize="28" VerticalTextAlignment="Center"/>
+                <Label Text="Lista de Compras"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}" />
+            </HorizontalStackLayout>
+
+            <!-- Formulario -->
+            <Border Stroke="{StaticResource Stroke}"
+                    Background="{StaticResource Surface}"
+                    StrokeShape="RoundRectangle 14"
+                    Padding="14">
+                <VerticalStackLayout Spacing="10">
+
+                    <Entry Style="{StaticResource Input}"
+                           Placeholder="Producto (ej. Arroz)"
+                           Text="{Binding NuevoNombre}" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Entry Grid.Column="0"
+                               Style="{StaticResource Input}"
+                               Placeholder="Cantidad (ej. 2)"
+                               Keyboard="Numeric"
+                               Text="{Binding NuevaCantidadTexto}" />
+                        <Button Grid.Column="1"
+                                Style="{StaticResource PillBtn}"
+                                Text="Agregar"
+                                Command="{Binding AgregarArticuloCommand}" />
+                    </Grid>
+
+                    <Editor Style="{StaticResource InputMulti}"
+                            Placeholder="Notas (opcional)"
+                            AutoSize="TextChanges"
+                            Text="{Binding NuevasNotas}" />
+
+                    <Label Text="{Binding MensajeError}"
+                           TextColor="{StaticResource Danger}"
+                           FontSize="12" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Encabezado lista -->
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Text="Artículos"
+                       TextColor="{StaticResource TextPrimary}"
+                       FontAttributes="Bold"
+                       FontSize="18" />
+                <Button Grid.Column="1"
+                        Style="{StaticResource PillBtn}"
+                        BackgroundColor="{StaticResource DangerDark}"
+                        Text="Vaciar lista"
+                        Command="{Binding VaciarListaCommand}" />
+            </Grid>
+
+            <!-- Lista -->
+            <CollectionView ItemsSource="{Binding Articulos}">
+                <CollectionView.EmptyView>
+                    <Label Text="No hay artículos. Agrega el primero arriba."
+                           TextColor="{StaticResource TextMuted}"
+                           HorizontalOptions="Center"
+                           Margin="0,16" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Ítem compacto -->
+                        <Border Background="{StaticResource Surface}"
+                                Stroke="{StaticResource Stroke}"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="8"
+                                Margin="0,6">
+
+                            <!-- Auto(check) | * (texto) | Auto (eliminar) -->
+                            <Grid ColumnDefinitions="Auto,*,Auto"
+                                  RowDefinitions="Auto,Auto"
+                                  ColumnSpacing="6"
+                                  VerticalOptions="Center">
+
+                                <!-- Check (pegado al texto) -->
+                                <CheckBox Grid.RowSpan="2"
+                                          Margin="0,0,6,0"
+                                          VerticalOptions="Center"
+                                          HorizontalOptions="Center"
+                                          HeightRequest="22"
+                                          WidthRequest="22"
+                                          IsChecked="{Binding Comprado, Mode=TwoWay}" />
+
+                                <!-- Nombre + cantidad -->
+                                <HorizontalStackLayout Grid.Column="1"
+                                                       Spacing="6"
+                                                       VerticalOptions="Center">
+                                    <Label Text="{Binding Nombre}"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           FontAttributes="Bold">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label"
+                                                         Binding="{Binding Comprado}"
+                                                         Value="True">
+                                                <Setter Property="TextDecorations" Value="Strikethrough" />
+                                                <Setter Property="Opacity" Value="0.6" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                    <Label Text="{Binding Cantidad, StringFormat='x{0}'}"
+                                           TextColor="{StaticResource TextMuted}" />
+                                </HorizontalStackLayout>
+
+                                <!-- Eliminar (X visible) -->
+                                <Border Grid.Column="2"
+                                        Grid.RowSpan="2"
+                                        Style="{StaticResource DeleteCircle}">
+                                    <Label Text="✕"
+                                           FontSize="20"
+                                           TextColor="White"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center" />
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding BindingContext.EliminarArticuloCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+
+                                <!-- Notas -->
+                                <Label Grid.Row="1"
+                                       Grid.Column="1"
+                                       Margin="0,1,0,0"
+                                       Text="{Binding Notas}"
+                                       TextColor="{StaticResource TextMuted}"
+                                       FontSize="12">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Notas}" Value="">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Notas}" Value="{x:Null}">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
