@@ -9,7 +9,7 @@
     <!-- ==== Recursos locales (solo en esta página) ==== -->
     <ContentPage.Resources>
         <ResourceDictionary>
-            <!-- Paleta -->
+            <!-- Paleta de colores de la UI -->
             <Color x:Key="Bg">#0F1115</Color>
             <Color x:Key="Surface">#171A21</Color>
             <Color x:Key="SurfaceAlt">#1E2430</Color>
@@ -20,7 +20,7 @@
             <Color x:Key="Danger">#EF4444</Color>
             <Color x:Key="DangerDark">#B91C1C</Color>
 
-            <!-- Estilos -->
+            <!-- Estilo base para Entry (inputs de una sola línea) -->
             <Style TargetType="Entry" x:Key="Input">
                 <Setter Property="BackgroundColor" Value="{StaticResource SurfaceAlt}" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
@@ -28,12 +28,14 @@
                 <Setter Property="HeightRequest" Value="42"/>
             </Style>
 
+            <!-- Estilo base para Editor (texto multilínea) -->
             <Style TargetType="Editor" x:Key="InputMulti">
                 <Setter Property="BackgroundColor" Value="{StaticResource SurfaceAlt}" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
                 <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
             </Style>
 
+            <!-- Estilo de botón "pastilla" (redondeado, alto fijo, negrita) -->
             <Style TargetType="Button" x:Key="PillBtn">
                 <Setter Property="CornerRadius" Value="12"/>
                 <Setter Property="HeightRequest" Value="42"/>
@@ -42,7 +44,7 @@
                 <Setter Property="BackgroundColor" Value="{StaticResource Accent}"/>
             </Style>
 
-            <!-- Botón circular rojo de eliminar (X como Label dentro) -->
+            <!-- Botón circular rojo para eliminar (se usa un Border + Label "X") -->
             <Style TargetType="Border" x:Key="DeleteCircle">
                 <Setter Property="BackgroundColor" Value="{StaticResource Danger}"/>
                 <Setter Property="Stroke" Value="{StaticResource DangerDark}"/>
@@ -56,14 +58,16 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
+    <!-- BindingContext de la página: instancia del ViewModel -->
     <ContentPage.BindingContext>
         <viewmodels:ListaComprasViewModel />
     </ContentPage.BindingContext>
 
+    <!-- Scroll general de la página -->
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="16">
 
-            <!-- Título -->
+            <!-- Título con icono -->
             <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
                 <Label Text="🛒" FontSize="28" VerticalTextAlignment="Center"/>
                 <Label Text="Lista de Compras"
@@ -72,46 +76,53 @@
                        TextColor="{StaticResource TextPrimary}" />
             </HorizontalStackLayout>
 
-            <!-- Formulario -->
+            <!-- Formulario de captura: nombre, cantidad, notas y errores -->
             <Border Stroke="{StaticResource Stroke}"
                     Background="{StaticResource Surface}"
                     StrokeShape="RoundRectangle 14"
                     Padding="14">
                 <VerticalStackLayout Spacing="10">
 
+                    <!-- Nombre del producto: enlaza a NuevoNombre -->
                     <Entry Style="{StaticResource Input}"
                            Placeholder="Producto (ej. Arroz)"
                            Text="{Binding NuevoNombre}" />
 
+                    <!-- Cantidad + botón Agregar (comando al VM) -->
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <!-- Cantidad como texto: enlaza a NuevaCantidadTexto -->
                         <Entry Grid.Column="0"
                                Style="{StaticResource Input}"
                                Placeholder="Cantidad (ej. 2)"
                                Keyboard="Numeric"
                                Text="{Binding NuevaCantidadTexto}" />
+                        <!-- Botón que ejecuta AgregarArticuloCommand generado por [RelayCommand] -->
                         <Button Grid.Column="1"
                                 Style="{StaticResource PillBtn}"
                                 Text="Agregar"
                                 Command="{Binding AgregarArticuloCommand}" />
                     </Grid>
 
+                    <!-- Notas opcionales: enlaza a NuevasNotas -->
                     <Editor Style="{StaticResource InputMulti}"
                             Placeholder="Notas (opcional)"
                             AutoSize="TextChanges"
                             Text="{Binding NuevasNotas}" />
 
+                    <!-- Mensaje de validación del ViewModel -->
                     <Label Text="{Binding MensajeError}"
                            TextColor="{StaticResource Danger}"
                            FontSize="12" />
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Encabezado lista -->
+            <!-- Encabezado de la lista + botón para vaciarla -->
             <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
                 <Label Text="Artículos"
                        TextColor="{StaticResource TextPrimary}"
                        FontAttributes="Bold"
                        FontSize="18" />
+                <!-- Ejecuta VaciarListaCommand del VM -->
                 <Button Grid.Column="1"
                         Style="{StaticResource PillBtn}"
                         BackgroundColor="{StaticResource DangerDark}"
@@ -119,8 +130,9 @@
                         Command="{Binding VaciarListaCommand}" />
             </Grid>
 
-            <!-- Lista -->
+            <!-- Listado de artículos: CollectionView enlazada a Articulos -->
             <CollectionView ItemsSource="{Binding Articulos}">
+                <!-- Vista cuando la lista está vacía -->
                 <CollectionView.EmptyView>
                     <Label Text="No hay artículos. Agrega el primero arriba."
                            TextColor="{StaticResource TextMuted}"
@@ -130,35 +142,37 @@
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <!-- Ítem compacto -->
+                        <!-- Contenedor visual del ítem -->
                         <Border Background="{StaticResource Surface}"
                                 Stroke="{StaticResource Stroke}"
                                 StrokeShape="RoundRectangle 14"
                                 Padding="8"
                                 Margin="0,6">
 
-                            <!-- Auto(check) | * (texto) | Auto (eliminar) -->
+                            <!-- Layout del ítem: [Check] [Nombre+Cantidad] [Eliminar] + [Notas] -->
                             <Grid ColumnDefinitions="Auto,*,Auto"
                                   RowDefinitions="Auto,Auto"
                                   ColumnSpacing="6"
                                   VerticalOptions="Center">
 
-                                <!-- Check (pegado al texto) -->
+                                <!-- Check: enlazado a Comprado (TwoWay para actualizar el modelo) -->
                                 <CheckBox Grid.RowSpan="2"
-                                          Margin="0,0,6,0"
+                                          Margin="0,0,0,0"
                                           VerticalOptions="Center"
                                           HorizontalOptions="Center"
                                           HeightRequest="22"
                                           WidthRequest="22"
                                           IsChecked="{Binding Comprado, Mode=TwoWay}" />
 
-                                <!-- Nombre + cantidad -->
+                                <!-- Nombre + Cantidad (xN). Se aplica tachado y opacidad si Comprado = true -->
                                 <HorizontalStackLayout Grid.Column="1"
                                                        Spacing="6"
                                                        VerticalOptions="Center">
+                                    <!-- Nombre del artículo -->
                                     <Label Text="{Binding Nombre}"
                                            TextColor="{StaticResource TextPrimary}"
                                            FontAttributes="Bold">
+                                        <!-- Disparador visual: si está comprado, tachado y más tenue -->
                                         <Label.Triggers>
                                             <DataTrigger TargetType="Label"
                                                          Binding="{Binding Comprado}"
@@ -169,11 +183,12 @@
                                         </Label.Triggers>
                                     </Label>
 
+                                    <!-- Cantidad mostrada como "xN" -->
                                     <Label Text="{Binding Cantidad, StringFormat='x{0}'}"
                                            TextColor="{StaticResource TextMuted}" />
                                 </HorizontalStackLayout>
 
-                                <!-- Eliminar (X visible) -->
+                                <!-- Botón de eliminar (círculo rojo con una X) -->
                                 <Border Grid.Column="2"
                                         Grid.RowSpan="2"
                                         Style="{StaticResource DeleteCircle}">
@@ -182,6 +197,8 @@
                                            TextColor="White"
                                            HorizontalTextAlignment="Center"
                                            VerticalTextAlignment="Center" />
+                                    <!-- Tap que llama al comando EliminarArticuloCommand del ViewModel de la página.
+                                         Se usa RelativeSource para subir al ContentPage y tomar su BindingContext. -->
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer
                                             Command="{Binding BindingContext.EliminarArticuloCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
@@ -189,13 +206,14 @@
                                     </Border.GestureRecognizers>
                                 </Border>
 
-                                <!-- Notas -->
+                                <!-- Notas del artículo (ocultas si están vacías o nulas) -->
                                 <Label Grid.Row="1"
                                        Grid.Column="1"
                                        Margin="0,1,0,0"
                                        Text="{Binding Notas}"
                                        TextColor="{StaticResource TextMuted}"
                                        FontSize="12">
+                                    <!-- Dos disparadores para esconder cuando Notas == "" o Notas == null -->
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding Notas}" Value="">
                                             <Setter Property="IsVisible" Value="False" />

@@ -1,18 +1,24 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace ListaCompras.Models;
-
-public partial class Articulo : ObservableObject
+namespace ListaCompras.Models
 {
-    [ObservableProperty]
-    private string nombre = string.Empty;
+    // Modelo que representa un artículo en la lista de compras
+    public partial class Articulo : ObservableObject
+    {
+        // Nombre del producto
+        [ObservableProperty]
+        private string nombre = string.Empty;
 
-    [ObservableProperty]
-    private int cantidad;
+        // Cantidad del producto
+        [ObservableProperty]
+        private int cantidad;
 
-    [ObservableProperty]
-    private bool comprado;
+        // Indica si fue comprado
+        [ObservableProperty]
+        private bool comprado;
 
-    [ObservableProperty]
-    private string notas = string.Empty;
+        // Notas adicionales
+        [ObservableProperty]
+        private string notas = string.Empty;
+    }
 }
