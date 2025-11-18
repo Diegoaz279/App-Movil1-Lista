@@ -1,18 +1,17 @@
-﻿using ListaCompras.Views;
-
-namespace ListaCompras
+﻿namespace ListaCompras
 {
     public partial class App : Application
     {
-        public App()
+        // La página principal se resuelve por inyección de dependencias (DI)
+        public App(Views.ListaComprasPage mainPage)
         {
             InitializeComponent();
-        }
 
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            // Recomendado en .NET 9
-            return new Window(new ListaComprasPage());
+            // Si quieres barra de navegación, usa NavigationPage
+            MainPage = new NavigationPage(mainPage);
+
+            // Si NO quieres barra de navegación:
+            // MainPage = mainPage;
         }
     }
 }

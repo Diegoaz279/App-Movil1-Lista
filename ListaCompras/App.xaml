@@ -3,9 +3,11 @@
     x:Class="ListaCompras.App"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
     <Application.Resources>
         <ResourceDictionary>
-            <!-- Puedes agregar estilos globales si quieres -->
+            <!-- Por ahora sin estilos globales.
+                 TODO el diseño está dentro de ListaComprasPage.xaml -->
         </ResourceDictionary>
     </Application.Resources>
 </Application>

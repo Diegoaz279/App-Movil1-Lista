@@ -1,23 +1,34 @@
-﻿using ListaCompras.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using ListaCompras.Models;
 
 namespace ListaCompras.Services
 {
-    // Clase que actúa como "servicio" para manejar la lógica relacionada con las compras o artículos
     public class ServicioCompras
     {
-        // Método que devuelve una lista de ejemplo de artículos de compra
-        // Se usa al iniciar la aplicación para mostrar datos predefinidos en la lista
-        public List<Articulo> ObtenerEjemplo()
+        private readonly AppDatabase _db;
+
+        public ServicioCompras(AppDatabase db)
         {
-            // Retorna una lista inicial con algunos productos de ejemplo
-            // Esto simula datos que podrían venir de una base de datos o API
-            return new()
-            {
-                new Articulo { Nombre = "Leche",   Cantidad = 2 },
-                new Articulo { Nombre = "Huevos",  Cantidad = 12 },
-                new Articulo { Nombre = "Pan",     Cantidad = 1 },
-                new Articulo { Nombre = "Tomates", Cantidad = 4 }
-            };
+            _db = db;
         }
+
+        // === MÉTODOS QUE ESTÁ PIDIENDO TU VIEWMODEL ===
+
+        // Cargar todos los artículos desde SQLite
+        public Task<List<Articulo>> ObtenerTodosAsync()
+            => _db.GetArticulosAsync();
+
+        // Insertar o actualizar un artículo
+        public Task GuardarAsync(Articulo articulo)
+            => _db.SaveArticuloAsync(articulo);
+
+        // Eliminar un artículo
+        public Task EliminarAsync(Articulo articulo)
+            => _db.DeleteArticuloAsync(articulo);
+
+        // Vaciar tabla completa
+        public Task VaciarAsync()
+            => _db.DeleteAllAsync();
     }
 }

@@ -1,24 +1,30 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using SQLite;
 
 namespace ListaCompras.Models
 {
-    // Modelo que representa un artículo en la lista de compras
     public partial class Articulo : ObservableObject
     {
-        // Nombre del producto
+        [PrimaryKey, AutoIncrement]
+        public int Id { get; set; }
+
         [ObservableProperty]
         private string nombre = string.Empty;
 
-        // Cantidad del producto
         [ObservableProperty]
         private int cantidad;
 
-        // Indica si fue comprado
         [ObservableProperty]
         private bool comprado;
 
-        // Notas adicionales
         [ObservableProperty]
         private string notas = string.Empty;
+
+        [ObservableProperty]
+        private string categoria = string.Empty;
+
+        // Ruta local de la imagen seleccionada (archivo en el dispositivo)
+        [ObservableProperty]
+        private string imagenPath = string.Empty;
     }
 }

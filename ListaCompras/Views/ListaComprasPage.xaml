@@ -3,229 +3,511 @@
     x:Class="ListaCompras.Views.ListaComprasPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:viewmodels="clr-namespace:ListaCompras.ViewModels"
-    BackgroundColor="#0F1115">
+    xmlns:converters="clr-namespace:ListaCompras.Converters"
+    BackgroundColor="{StaticResource Bg}">
 
-    <!-- ==== Recursos locales (solo en esta página) ==== -->
+    <!-- ===== RECURSOS LOCALES (TODO EL DISEÑO ESTÁ AQUÍ) ===== -->
     <ContentPage.Resources>
         <ResourceDictionary>
-            <!-- Paleta de colores de la UI -->
-            <Color x:Key="Bg">#0F1115</Color>
-            <Color x:Key="Surface">#171A21</Color>
-            <Color x:Key="SurfaceAlt">#1E2430</Color>
-            <Color x:Key="Stroke">#2B3242</Color>
+
+            <!-- === PALETA DE COLORES LOCAL === -->
+            <Color x:Key="Bg">#05080F</Color>
+            <Color x:Key="Surface">#10141F</Color>
+            <Color x:Key="SurfaceAlt">#151B27</Color>
+            <Color x:Key="SurfaceCard">#181F2C</Color>
+            <Color x:Key="Stroke">#232C3B</Color>
+
+            <Color x:Key="Primary">#00D4FF</Color>
+            <Color x:Key="PrimaryDark">#009CB8</Color>
+            <Color x:Key="Accent">#14F1B3</Color>
+
+            <Color x:Key="Danger">#FF4E4E</Color>
+            <Color x:Key="DangerDark">#C73333</Color>
+
             <Color x:Key="TextPrimary">#FFFFFF</Color>
-            <Color x:Key="TextMuted">#B9C0CF</Color>
-            <Color x:Key="Accent">#8B5CF6</Color>
-            <Color x:Key="Danger">#EF4444</Color>
-            <Color x:Key="DangerDark">#B91C1C</Color>
+            <Color x:Key="TextMuted">#A5B1C5</Color>
+            <Color x:Key="TextSoft">#7E8897</Color>
 
-            <!-- Estilo base para Entry (inputs de una sola línea) -->
-            <Style TargetType="Entry" x:Key="Input">
+            <!-- === CONVERTER LOCAL === -->
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+
+            <!-- === SOMBRA PARA TARJETAS === -->
+            <Shadow x:Key="CardShadow"
+                    Brush="#88000000"
+                    Radius="22"
+                    Opacity="0.55"
+                    Offset="0,10" />
+
+            <!-- === ESTILOS === -->
+
+            <!-- Texto título sección -->
+            <Style TargetType="Label" x:Key="SectionTitle">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <!-- Texto normal (override local de Label) -->
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <!-- Input wrapper -->
+            <Style TargetType="Border" x:Key="InputWrapper">
+                <Setter Property="Stroke" Value="{StaticResource Stroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceAlt}" />
+                <Setter Property="Padding" Value="4" />
+            </Style>
+
+            <!-- Botón principal degradado -->
+            <Style TargetType="Button" x:Key="PrimaryBtn">
+                <Setter Property="HeightRequest" Value="48" />
+                <Setter Property="CornerRadius" Value="24" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="TextColor" Value="Black" />
+                <Setter Property="Shadow" Value="{StaticResource CardShadow}" />
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="{StaticResource Primary}" Offset="0.0" />
+                            <GradientStop Color="{StaticResource Accent}" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Botón outline peligro -->
+            <Style TargetType="Button" x:Key="OutlineDangerBtn">
+                <Setter Property="HeightRequest" Value="40" />
+                <Setter Property="CornerRadius" Value="20" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{StaticResource Danger}" />
+                <Setter Property="BorderColor" Value="{StaticResource Danger}" />
+                <Setter Property="BorderWidth" Value="1.5" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Padding" Value="16,0" />
+            </Style>
+
+            <!-- Overrides básicos de Entry / Editor / Button -->
+            <Style TargetType="Entry">
                 <Setter Property="BackgroundColor" Value="{StaticResource SurfaceAlt}" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
                 <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
-                <Setter Property="HeightRequest" Value="42"/>
+                <Setter Property="HeightRequest" Value="44" />
+                <Setter Property="Margin" Value="0,4" />
             </Style>
 
-            <!-- Estilo base para Editor (texto multilínea) -->
-            <Style TargetType="Editor" x:Key="InputMulti">
+            <Style TargetType="Editor">
                 <Setter Property="BackgroundColor" Value="{StaticResource SurfaceAlt}" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
                 <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
+                <Setter Property="AutoSize" Value="TextChanges" />
+                <Setter Property="Margin" Value="0,4" />
             </Style>
 
-            <!-- Estilo de botón "pastilla" (redondeado, alto fijo, negrita) -->
-            <Style TargetType="Button" x:Key="PillBtn">
-                <Setter Property="CornerRadius" Value="12"/>
-                <Setter Property="HeightRequest" Value="42"/>
-                <Setter Property="FontAttributes" Value="Bold"/>
-                <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
-                <Setter Property="BackgroundColor" Value="{StaticResource Accent}"/>
+            <Style TargetType="Button">
+                <Setter Property="CornerRadius" Value="18" />
+                <Setter Property="HeightRequest" Value="46" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="14" />
             </Style>
 
-            <!-- Botón circular rojo para eliminar (se usa un Border + Label "X") -->
-            <Style TargetType="Border" x:Key="DeleteCircle">
-                <Setter Property="BackgroundColor" Value="{StaticResource Danger}"/>
-                <Setter Property="Stroke" Value="{StaticResource DangerDark}"/>
-                <Setter Property="StrokeShape" Value="RoundRectangle 22"/>
-                <Setter Property="WidthRequest" Value="44"/>
-                <Setter Property="HeightRequest" Value="44"/>
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="HorizontalOptions" Value="End"/>
-                <Setter Property="VerticalOptions" Value="Center"/>
-            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <!-- BindingContext de la página: instancia del ViewModel -->
-    <ContentPage.BindingContext>
-        <viewmodels:ListaComprasViewModel />
-    </ContentPage.BindingContext>
-
-    <!-- Scroll general de la página -->
+    <!-- ===== CONTENIDO ===== -->
     <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="16">
+        <VerticalStackLayout Padding="18,26" Spacing="18">
 
-            <!-- Título con icono -->
-            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-                <Label Text="🛒" FontSize="28" VerticalTextAlignment="Center"/>
-                <Label Text="Lista de Compras"
-                       FontSize="28"
-                       FontAttributes="Bold"
-                       TextColor="{StaticResource TextPrimary}" />
-            </HorizontalStackLayout>
+            <!-- ========== HEADER ========== -->
+            <Border
+                BackgroundColor="{StaticResource SurfaceCard}"
+                Stroke="{StaticResource Stroke}"
+                StrokeShape="RoundRectangle 26"
+                Padding="18"
+                Shadow="{StaticResource CardShadow}">
 
-            <!-- Formulario de captura: nombre, cantidad, notas y errores -->
-            <Border Stroke="{StaticResource Stroke}"
-                    Background="{StaticResource Surface}"
-                    StrokeShape="RoundRectangle 14"
-                    Padding="14">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                    <Border
+                        WidthRequest="54"
+                        HeightRequest="54"
+                        BackgroundColor="{StaticResource PrimaryDark}"
+                        StrokeShape="RoundRectangle 27">
+                        <Label
+                            Text="🛒"
+                            FontSize="28"
+                            HorizontalTextAlignment="Center"
+                            VerticalTextAlignment="Center" />
+                    </Border>
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label
+                            Text="Lista de Compras"
+                            FontSize="24"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource TextPrimary}" />
+                        <Label
+                            Text="Administra tus productos con fotos, categorías y notas."
+                            FontSize="12"
+                            TextColor="{StaticResource TextMuted}" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- ========== BUSQUEDA + CATEGORÍA ========== -->
+            <Border
+                BackgroundColor="{StaticResource Surface}"
+                Stroke="{StaticResource Stroke}"
+                StrokeShape="RoundRectangle 22"
+                Padding="14,10"
+                Shadow="{StaticResource CardShadow}">
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+
+                    <SearchBar
+                        Placeholder="Buscar por nombre o notas..."
+                        Text="{Binding TextoBusqueda}"
+                        BackgroundColor="{StaticResource SurfaceAlt}"
+                        TextColor="{StaticResource TextPrimary}"
+                        PlaceholderColor="{StaticResource TextMuted}"
+                        CancelButtonColor="{StaticResource Primary}"
+                        FontSize="13"
+                        HeightRequest="40" />
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" WidthRequest="140">
+                        <Label
+                            Text="Categoría"
+                            FontSize="11"
+                            TextColor="{StaticResource TextMuted}" />
+                        <Picker
+                            ItemsSource="{Binding Categorias}"
+                            SelectedItem="{Binding CategoriaSeleccionada}"
+                            Title="Todas"
+                            BackgroundColor="{StaticResource SurfaceAlt}"
+                            TextColor="{StaticResource TextPrimary}"
+                            FontSize="12"
+                            HeightRequest="34" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- ========== FORMULARIO ========== -->
+            <Border
+                BackgroundColor="{StaticResource Surface}"
+                Stroke="{StaticResource Stroke}"
+                StrokeShape="RoundRectangle 26"
+                Padding="18"
+                Shadow="{StaticResource CardShadow}">
+
                 <VerticalStackLayout Spacing="10">
 
-                    <!-- Nombre del producto: enlaza a NuevoNombre -->
-                    <Entry Style="{StaticResource Input}"
-                           Placeholder="Producto (ej. Arroz)"
-                           Text="{Binding NuevoNombre}" />
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <Label Text="Detalle del artículo" Style="{StaticResource SectionTitle}" />
+                        <Label
+                            Text="EDITANDO"
+                            FontSize="11"
+                            TextColor="{StaticResource Accent}"
+                            FontAttributes="Bold"
+                            IsVisible="{Binding EstaEditando}" />
+                    </HorizontalStackLayout>
 
-                    <!-- Cantidad + botón Agregar (comando al VM) -->
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                        <!-- Cantidad como texto: enlaza a NuevaCantidadTexto -->
-                        <Entry Grid.Column="0"
-                               Style="{StaticResource Input}"
-                               Placeholder="Cantidad (ej. 2)"
-                               Keyboard="Numeric"
-                               Text="{Binding NuevaCantidadTexto}" />
-                        <!-- Botón que ejecuta AgregarArticuloCommand generado por [RelayCommand] -->
-                        <Button Grid.Column="1"
-                                Style="{StaticResource PillBtn}"
-                                Text="Agregar"
-                                Command="{Binding AgregarArticuloCommand}" />
+                    <Label
+                        Text="Completa el nombre, la cantidad, categoría, notas y una imagen opcional."
+                        FontSize="12"
+                        TextColor="{StaticResource TextSoft}" />
+
+                    <!-- Nombre -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label
+                            Text="Nombre del producto"
+                            FontSize="13"
+                            TextColor="{StaticResource TextMuted}" />
+                        <Border Style="{StaticResource InputWrapper}">
+                            <Entry
+                                Placeholder="Ej. Arroz, Yuca, Leche..."
+                                Text="{Binding NuevoNombre}" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Cantidad + categoría -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,4,0,0">
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label
+                                Text="Cantidad"
+                                FontSize="13"
+                                TextColor="{StaticResource TextMuted}" />
+                            <Border Style="{StaticResource InputWrapper}">
+                                <Entry
+                                    Placeholder="Ej. 3"
+                                    Keyboard="Numeric"
+                                    Text="{Binding NuevaCantidadTexto}" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="1" WidthRequest="150" Spacing="4">
+                            <Label
+                                Text="Categoría"
+                                FontSize="13"
+                                TextColor="{StaticResource TextMuted}" />
+                            <Border Style="{StaticResource InputWrapper}">
+                                <Picker
+                                    ItemsSource="{Binding Categorias}"
+                                    SelectedItem="{Binding CategoriaSeleccionada}"
+                                    BackgroundColor="{StaticResource SurfaceAlt}"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    FontSize="12" />
+                            </Border>
+                        </VerticalStackLayout>
                     </Grid>
 
-                    <!-- Notas opcionales: enlaza a NuevasNotas -->
-                    <Editor Style="{StaticResource InputMulti}"
-                            Placeholder="Notas (opcional)"
-                            AutoSize="TextChanges"
-                            Text="{Binding NuevasNotas}" />
+                    <!-- Notas -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label
+                            Text="Notas (opcional)"
+                            FontSize="13"
+                            TextColor="{StaticResource TextMuted}" />
+                        <Border Style="{StaticResource InputWrapper}">
+                            <Editor
+                                Placeholder="Marca, tamaño, oferta, etc."
+                                Text="{Binding NuevasNotas}" />
+                        </Border>
+                    </VerticalStackLayout>
 
-                    <!-- Mensaje de validación del ViewModel -->
-                    <Label Text="{Binding MensajeError}"
-                           TextColor="{StaticResource Danger}"
-                           FontSize="12" />
+                    <!-- Foto -->
+                    <VerticalStackLayout Spacing="6" Margin="0,6,0,0">
+                        <Label
+                            Text="Foto del producto (opcional)"
+                            FontSize="13"
+                            TextColor="{StaticResource TextMuted}" />
+
+                        <Button
+                            Text="Seleccionar foto"
+                            HeightRequest="40"
+                            CornerRadius="20"
+                            BackgroundColor="{StaticResource PrimaryDark}"
+                            TextColor="Black"
+                            Command="{Binding SeleccionarFotoCommand}" />
+
+                        <Border
+                            BackgroundColor="{StaticResource SurfaceAlt}"
+                            Stroke="{StaticResource Stroke}"
+                            StrokeShape="RoundRectangle 16"
+                            Padding="4"
+                            IsVisible="{Binding ImagenSeleccionadaPath, Converter={StaticResource NullToBoolConverter}}">
+                            <Image
+                                Source="{Binding ImagenSeleccionadaPath}"
+                                HeightRequest="140"
+                                Aspect="AspectFill" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Mensaje de error -->
+                    <Label
+                        Text="{Binding MensajeError}"
+                        TextColor="{StaticResource Danger}"
+                        FontSize="12"
+                        Margin="0,6,0,0" />
+
+                    <!-- Botones -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+
+                        <Button
+                            Grid.Column="0"
+                            Style="{StaticResource PrimaryBtn}"
+                            Command="{Binding GuardarArticuloCommand}">
+                            <Button.Triggers>
+                                <DataTrigger
+                                    TargetType="Button"
+                                    Binding="{Binding EstaEditando}"
+                                    Value="True">
+                                    <Setter Property="Text" Value="Guardar cambios" />
+                                </DataTrigger>
+                                <DataTrigger
+                                    TargetType="Button"
+                                    Binding="{Binding EstaEditando}"
+                                    Value="False">
+                                    <Setter Property="Text" Value="Agregar a la lista" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+
+                        <Button
+                            Grid.Column="1"
+                            Text="Cancelar"
+                            HeightRequest="40"
+                            CornerRadius="20"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource TextMuted}"
+                            Command="{Binding CancelarEdicionCommand}"
+                            IsVisible="{Binding EstaEditando}" />
+                    </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Encabezado de la lista + botón para vaciarla -->
+            <!-- ========== CABECERA LISTA ========== -->
             <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
-                <Label Text="Artículos"
-                       TextColor="{StaticResource TextPrimary}"
-                       FontAttributes="Bold"
-                       FontSize="18" />
-                <!-- Ejecuta VaciarListaCommand del VM -->
-                <Button Grid.Column="1"
-                        Style="{StaticResource PillBtn}"
-                        BackgroundColor="{StaticResource DangerDark}"
-                        Text="Vaciar lista"
-                        Command="{Binding VaciarListaCommand}" />
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Artículos guardados" Style="{StaticResource SectionTitle}" />
+                    <Label
+                        Text="Marca como comprados, edita o elimina los que ya no necesites."
+                        FontSize="12"
+                        TextColor="{StaticResource TextSoft}" />
+                </VerticalStackLayout>
+
+                <Button
+                    Grid.Column="1"
+                    Style="{StaticResource OutlineDangerBtn}"
+                    Text="Vaciar lista"
+                    Command="{Binding VaciarListaCommand}" />
             </Grid>
 
-            <!-- Listado de artículos: CollectionView enlazada a Articulos -->
-            <CollectionView ItemsSource="{Binding Articulos}">
-                <!-- Vista cuando la lista está vacía -->
+            <!-- ========== LISTA ========== -->
+            <CollectionView
+                Margin="0,6,0,24"
+                ItemsSource="{Binding Articulos}"
+                SelectionMode="None">
+
                 <CollectionView.EmptyView>
-                    <Label Text="No hay artículos. Agrega el primero arriba."
-                           TextColor="{StaticResource TextMuted}"
-                           HorizontalOptions="Center"
-                           Margin="0,16" />
+                    <VerticalStackLayout Margin="0,20" Spacing="4" HorizontalOptions="Center">
+                        <Label
+                            Text="No hay artículos todavía"
+                            FontSize="14"
+                            TextColor="{StaticResource TextMuted}"
+                            HorizontalTextAlignment="Center" />
+                        <Label
+                            Text="Agrega el primero usando el formulario superior."
+                            FontSize="12"
+                            TextColor="{StaticResource TextSoft}"
+                            HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
                 </CollectionView.EmptyView>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <!-- Contenedor visual del ítem -->
-                        <Border Background="{StaticResource Surface}"
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Imagen -->
+                            <Border
+                                Grid.Column="0"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                BackgroundColor="{StaticResource SurfaceAlt}"
                                 Stroke="{StaticResource Stroke}"
-                                StrokeShape="RoundRectangle 14"
-                                Padding="8"
-                                Margin="0,6">
+                                StrokeShape="RoundRectangle 16"
+                                Padding="0"
+                                Margin="0,0,8,0"
+                                IsVisible="{Binding ImagenPath, Converter={StaticResource NullToBoolConverter}}">
+                                <Image
+                                    Source="{Binding ImagenPath}"
+                                    Aspect="AspectFill" />
+                            </Border>
 
-                            <!-- Layout del ítem: [Check] [Nombre+Cantidad] [Eliminar] + [Notas] -->
-                            <Grid ColumnDefinitions="Auto,*,Auto"
-                                  RowDefinitions="Auto,Auto"
-                                  ColumnSpacing="6"
-                                  VerticalOptions="Center">
+                            <!-- Tarjeta -->
+                            <Border
+                                Grid.Column="1"
+                                BackgroundColor="{StaticResource SurfaceCard}"
+                                Stroke="{StaticResource Stroke}"
+                                StrokeShape="RoundRectangle 18"
+                                Padding="10"
+                                Shadow="{StaticResource CardShadow}">
 
-                                <!-- Check: enlazado a Comprado (TwoWay para actualizar el modelo) -->
-                                <CheckBox Grid.RowSpan="2"
-                                          Margin="0,0,0,0"
-                                          VerticalOptions="Center"
-                                          HorizontalOptions="Center"
-                                          HeightRequest="22"
-                                          WidthRequest="22"
-                                          IsChecked="{Binding Comprado, Mode=TwoWay}" />
+                                <Grid
+                                    ColumnDefinitions="Auto,*,Auto"
+                                    RowDefinitions="Auto,Auto"
+                                    ColumnSpacing="8">
 
-                                <!-- Nombre + Cantidad (xN). Se aplica tachado y opacidad si Comprado = true -->
-                                <HorizontalStackLayout Grid.Column="1"
-                                                       Spacing="6"
-                                                       VerticalOptions="Center">
-                                    <!-- Nombre del artículo -->
-                                    <Label Text="{Binding Nombre}"
-                                           TextColor="{StaticResource TextPrimary}"
-                                           FontAttributes="Bold">
-                                        <!-- Disparador visual: si está comprado, tachado y más tenue -->
+                                    <!-- Check -->
+                                    <CheckBox
+                                        Grid.RowSpan="2"
+                                        VerticalOptions="Center"
+                                        HorizontalOptions="Center"
+                                        IsChecked="{Binding Comprado, Mode=TwoWay}" />
+
+                                    <!-- Nombre + Cantidad + Categoría -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label
+                                                Text="{Binding Nombre}"
+                                                FontSize="15"
+                                                FontAttributes="Bold"
+                                                TextColor="{StaticResource TextPrimary}">
+                                                <Label.Triggers>
+                                                    <DataTrigger
+                                                        TargetType="Label"
+                                                        Binding="{Binding Comprado}"
+                                                        Value="True">
+                                                        <Setter Property="TextDecorations" Value="Strikethrough" />
+                                                        <Setter Property="Opacity" Value="0.6" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+
+                                            <Label
+                                                Text="{Binding Cantidad, StringFormat='x{0}'}"
+                                                FontSize="13"
+                                                TextColor="{StaticResource TextMuted}" />
+                                        </HorizontalStackLayout>
+
+                                        <Label
+                                            Text="{Binding Categoria}"
+                                            FontSize="11"
+                                            TextColor="{StaticResource Accent}" />
+                                    </VerticalStackLayout>
+
+                                    <!-- Botón eliminar -->
+                                    <Button
+                                        Grid.Column="2"
+                                        Grid.RowSpan="2"
+                                        Text="✕"
+                                        FontSize="16"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource Danger}"
+                                        Command="{Binding BindingContext.EliminarArticuloCommand,
+                                                          Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                        CommandParameter="{Binding .}" />
+
+                                    <!-- Notas -->
+                                    <Label
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="0,4,0,0"
+                                        Text="{Binding Notas}"
+                                        FontSize="12"
+                                        TextColor="{StaticResource TextSoft}">
                                         <Label.Triggers>
-                                            <DataTrigger TargetType="Label"
-                                                         Binding="{Binding Comprado}"
-                                                         Value="True">
-                                                <Setter Property="TextDecorations" Value="Strikethrough" />
-                                                <Setter Property="Opacity" Value="0.6" />
+                                            <DataTrigger
+                                                TargetType="Label"
+                                                Binding="{Binding Notas}"
+                                                Value="">
+                                                <Setter Property="IsVisible" Value="False" />
+                                            </DataTrigger>
+                                            <DataTrigger
+                                                TargetType="Label"
+                                                Binding="{Binding Notas}"
+                                                Value="{x:Null}">
+                                                <Setter Property="IsVisible" Value="False" />
                                             </DataTrigger>
                                         </Label.Triggers>
                                     </Label>
 
-                                    <!-- Cantidad mostrada como "xN" -->
-                                    <Label Text="{Binding Cantidad, StringFormat='x{0}'}"
-                                           TextColor="{StaticResource TextMuted}" />
-                                </HorizontalStackLayout>
-
-                                <!-- Botón de eliminar (círculo rojo con una X) -->
-                                <Border Grid.Column="2"
-                                        Grid.RowSpan="2"
-                                        Style="{StaticResource DeleteCircle}">
-                                    <Label Text="✕"
-                                           FontSize="20"
-                                           TextColor="White"
-                                           HorizontalTextAlignment="Center"
-                                           VerticalTextAlignment="Center" />
-                                    <!-- Tap que llama al comando EliminarArticuloCommand del ViewModel de la página.
-                                         Se usa RelativeSource para subir al ContentPage y tomar su BindingContext. -->
-                                    <Border.GestureRecognizers>
+                                    <!-- Tap para editar -->
+                                    <Grid.GestureRecognizers>
                                         <TapGestureRecognizer
-                                            Command="{Binding BindingContext.EliminarArticuloCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                            Command="{Binding BindingContext.EditarArticuloCommand,
+                                                              Source={RelativeSource AncestorType={x:Type ContentPage}}}"
                                             CommandParameter="{Binding .}" />
-                                    </Border.GestureRecognizers>
-                                </Border>
-
-                                <!-- Notas del artículo (ocultas si están vacías o nulas) -->
-                                <Label Grid.Row="1"
-                                       Grid.Column="1"
-                                       Margin="0,1,0,0"
-                                       Text="{Binding Notas}"
-                                       TextColor="{StaticResource TextMuted}"
-                                       FontSize="12">
-                                    <!-- Dos disparadores para esconder cuando Notas == "" o Notas == null -->
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding Notas}" Value="">
-                                            <Setter Property="IsVisible" Value="False" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding Notas}" Value="{x:Null}">
-                                            <Setter Property="IsVisible" Value="False" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-
-                            </Grid>
-                        </Border>
+                                    </Grid.GestureRecognizers>
+                                </Grid>
+                            </Border>
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
